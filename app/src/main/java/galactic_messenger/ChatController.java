@@ -18,9 +18,7 @@ public class ChatController {
     @MessageMapping("/chat.register")
     @SendTo("/topic/public")
     public ChatMessage register(@Payload ChatMessage chatMessage, SimpMessageHeaderAccessor headerAccessor) {
-        System.out.println(chatMessage.getSender() + " has joined the chat.");
-        jdbcTemplate.execute("insert into user (name, email) "
-        + "values ('Will Smith', 'will.smith@holywood.com','password')");
+        jdbcTemplate.execute("insert into users (name, email,password) values ('"+chatMessage.getSender() +"', 'test','password')");
         headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
         return chatMessage;
     }
@@ -28,7 +26,6 @@ public class ChatController {
     @MessageMapping("/chat.send")
     @SendTo("/topic/public")
     public ChatMessage sendMessage(@Payload ChatMessage chatMessage) {
-        System.out.println(chatMessage.getContent());
         return chatMessage;
     }
 }

@@ -17,15 +17,16 @@ public class DatabaseInitializer {
              
             @Override
             public void run(String... args) throws Exception {
+                try {
+                    jdbcTemplate.execute("drop table users");
+                } catch (Exception e) {
+                    
+                }
+                jdbcTemplate.execute("create table users (id int primary key auto_increment, name varchar(30), email varchar(30),password varchar(255))");
+                
+                jdbcTemplate.execute("insert into users (name, email,password) values ('Will Smith', 'will.smith@holywood.com','password')");
                  
-                jdbcTemplate.execute("create table user (id int primary key "
-                        + "auto_increment, name varchar(30), email varchar(30),password varchar(255))");
-                 
-                jdbcTemplate.execute("insert into user (name, email) "
-                        + "values ('Will Smith', 'will.smith@holywood.com','password')");
-                 
-                jdbcTemplate.execute("insert into user (name, email) "
-                        + "values ('Bill Gates', 'bill.gates@microsoft.com','password')");
+                jdbcTemplate.execute("insert into users (name, email,password) values ('Bill Gates', 'bill.gates@microsoft.com','password')");
                  
             }
         };
