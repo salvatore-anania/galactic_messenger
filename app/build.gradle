@@ -1,5 +1,15 @@
 plugins {
     id 'java'
+    id 'org.springframework.boot' version "3.1.4"
+	id 'io.spring.dependency-management' version '1.1.3'
+
+}
+description 'Serveur Rest utilisant le framework Spring Boot'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
 }
 
 repositories {
@@ -9,6 +19,10 @@ repositories {
 dependencies {
     testImplementation 'junit:junit:4.13.2'
     implementation 'com.google.guava:guava:32.1.1-jre'
+    runtimeOnly 'com.h2database:h2'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.projectlombok:lombok'
 }
 
 java {
@@ -43,6 +57,7 @@ project(':app') {
 
     dependencies {
         // Ajoutez les dépendances spécifiques au serveur
+        
     }
 
     // Tâche de création d'un JAR pour le serveur
