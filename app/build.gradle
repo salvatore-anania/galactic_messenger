@@ -1,15 +1,5 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version "3.1.4"
-	id 'io.spring.dependency-management' version '1.1.3'
-
-}
-description 'Serveur Rest utilisant le framework Spring Boot'
-
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
 }
 
 repositories {
@@ -19,11 +9,7 @@ repositories {
 dependencies {
     testImplementation 'junit:junit:4.13.2'
     implementation 'com.google.guava:guava:32.1.1-jre'
-    runtimeOnly 'com.h2database:h2'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly 'org.projectlombok:lombok'
-}
+    implementation group: 'com.h2database', name: 'h2', version: '1.3.148'}
 
 java {
     toolchain {
@@ -53,11 +39,11 @@ project(':app') {
 // Configuration du projet serveur
 project(':app') {
     apply plugin: 'application'
-    mainClassName = 'galactic_test.server.ServerMain'
+    mainClassName = 'galactic_messenger.server.ServerMain'
 
     dependencies {
         // Ajoutez les dépendances spécifiques au serveur
-        
+        implementation 'com.h2database:h2:1.4.200'
     }
 
     // Tâche de création d'un JAR pour le serveur
@@ -66,7 +52,7 @@ project(':app') {
         archiveBaseName = 'galactic_messenger_server'
 
         manifest {
-            attributes 'Main-Class': 'galactic_test.server.ServerMain'
+            attributes 'Main-Class': 'galactic_messenger.server.ServerMain'
         }
     }
 }
@@ -75,4 +61,3 @@ project(':app') {
 task generateJars(dependsOn: [':app:clientJar', ':app:serverJar']) {
     // Cette tâche n'a pas besoin de code spécifique, elle dépend simplement des tâches clientJar et serverJar.
 }
-
