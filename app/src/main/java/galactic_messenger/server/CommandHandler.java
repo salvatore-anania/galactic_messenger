@@ -2,11 +2,15 @@ package galactic_messenger.server;
 import java.net.*;
 import java.io.*;
 import java.sql.*;
+import java.util.List;
+
+import galactic_messenger.model.Channels;
+import galactic_messenger.model.Users;
 
 
 public class CommandHandler {
 
-    public int getCommand(String message, Socket clientSocket, Connection connection) {
+    public int[] getCommand(String message, Users user, Connection connection, List<Channels> channels) {
         int commandeCode = 0;
         if (message.equals("/help")) {
             commandeCode = 1;
@@ -17,22 +21,37 @@ public class CommandHandler {
         if (message.startsWith("/login")) {
             commandeCode = 3;
         }
-        doComand(message, commandeCode, clientSocket, connection);
-        return commandeCode;
+        if (message.startsWith("/private_chat")) {
+            commandeCode = 4;
+        }
+        if (message.startsWith("/accept") || message.startsWith("/decline")) {
+            commandeCode = 5;
+        }
+        if (message.startsWith("/exit_private_chat") || message.startsWith("/decline")) {
+            commandeCode = 6;
+        }
+        int isRegistered = doComand(message, commandeCode, user, connection,channels);
+        int[] returnValue = {commandeCode, isRegistered};
+        return returnValue;
     }
     
-    public void doComand(String message, int commandeCode, Socket clientSocket, Connection connection) {
+    public int doComand(String message, int commandeCode, Users user, Connection connection, List<Channels> channels) {
         switch (commandeCode) {
             case 1:
-                doHelp(clientSocket);
-                break;
+                doHelp(user.getSocket());
+                return 0;
             case 2:
-                this.doRegister(message, connection);
-                break;
+                return ConnexionHandler.doRegister(message, connection, user.getSocket());
             case 3:
-                break;
+                return ConnexionHandler.doLogin(message, connection, user);
+            case 4:
+                return OneToOneHandler.doConnexionRequest(user, message, channels.get(1));
+            case 5:
+                return OneToOneHandler.doConnexionResponse(channels, user, channels.get(1).getUserByUsername(message.split(" ")[1]), message);
+            case 6:
+                return OneToOneHandler.doExitPrivate(user, channels);
             default:
-                break;
+                return 0;
         }
     }
     
@@ -48,31 +67,7 @@ public class CommandHandler {
         }
     }
     
-    public void doRegister(String message, Connection connection) {
-            try {
-            // Utilisez une requête paramétrée pour insérer des données
-            String sql = "INSERT INTO users (name, password) VALUES (?, ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, message.split(" ")[1]);
-            preparedStatement.setString(2, message.split(" ")[2]);
-
-            // Exécutez la requête
-            preparedStatement.executeUpdate();
-
-            // Fermez la déclaration et la connexion
-            preparedStatement.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+    
 }
 
 

@@ -6,8 +6,8 @@ import java.util.Scanner;
 
 public class ClientMain {
     public static void main(String[] args) {
-        String serverAddress = args[0]; // Adresse du serveur
-        int serverPort = Integer.parseInt(args[1]); // Port du serveur
+        String serverAddress = ""; // Adresse du serveur
+        int serverPort = 8080; // Port du serveur
 
         try (Socket socket = new Socket(serverAddress, serverPort)) {
             System.out.println("Connecté au serveur " + serverAddress + " sur le port " + serverPort);

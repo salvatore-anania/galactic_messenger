@@ -8,19 +8,26 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import galactic_messenger.model.Channels;
+import galactic_messenger.model.Users;
+
+
 public class ServerMain {
     public static void main(String[] args) {
-        int serverPort = Integer.parseInt(args[0]); // Port du serveur
+        int serverPort = 8080; // Port du serveur
 
+        
         try {
             Class.forName("org.h2.Driver");
         } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
-            return;
         }
 
+        
+
         // Définissez l'URL de la base de données H2 (en mémoire) et les informations de connexion
-        String dbUrl = "jdbc:h2:mem:testdb"; // Changez l'URL si nécessaire
+        String dbUrl = "jdbc:h2:mem:demo"; // Changez l'URL si nécessaire
         String dbUser = "sa"; // Utilisateur par défaut pour H2
         String dbPassword = ""; // Mot de passe par défaut pour H2
 
@@ -30,7 +37,11 @@ public class ServerMain {
 
             DatabaseInitializer.initializeDatabase(connection); // Vous pouvez appeler cette méthode si nécessaire
 
-            List<Socket> clients = new ArrayList<>();
+            List<Users> clients = new ArrayList<>();
+            List<Users> connectedClients = new ArrayList<>();
+            List<Channels> channels = new ArrayList<>();
+            channels.add(new Channels(clients, ""));
+            channels.add(new Channels(connectedClients, ""));
 
             try (ServerSocket serverSocket = new ServerSocket(serverPort)) {
                 InetAddress serverAddress = InetAddress.getLocalHost(); // Obtient l'adresse IP de la machine locale
@@ -41,10 +52,10 @@ public class ServerMain {
                     Socket clientSocket = serverSocket.accept();
                     System.out.println("Nouvelle connexion : " + clientSocket.getInetAddress().getHostAddress());
 
-                    clients.add(clientSocket);
+                    clients.add(new Users(clientSocket, "", channels.get(0)));
 
                     // Créez un thread pour gérer la communication avec le client
-                    Thread clientThread = new Thread(new ClientHandler(clientSocket, clients, connection));
+                    Thread clientThread = new Thread(new ClientHandler(clientSocket, channels, connection));
                     clientThread.start();
                 }
             } catch (IOException e) {
