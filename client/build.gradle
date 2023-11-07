@@ -1,0 +1,12 @@
+plugins {
+    id 'java'
+}
+
+jar {
+    from sourceSets.main.output
+    archiveBaseName = 'galactic_messenger_client'
+    manifest {
+            attributes 'Main-Class': 'ClientMain'
+    }
+    destinationDirectory = file('../build/libs')
+}

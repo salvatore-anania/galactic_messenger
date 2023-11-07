@@ -1,0 +1,16 @@
+allprojects {
+    apply plugin: 'java'
+    sourceCompatibility = JavaVersion.VERSION_20
+    targetCompatibility = JavaVersion.VERSION_20
+    dependencies {
+        implementation 'com.h2database:h2:1.4.200'
+    }
+}
+
+subprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+build.dependsOn(':server:jar', ':client:jar')

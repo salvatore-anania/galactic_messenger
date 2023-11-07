@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+dependencies {
+    runtimeOnly group: 'com.h2database', name: 'h2', version: '1.4.200' // Ajoutez la dépendance H2 ici)
+}
+
+jar {
+    from {
+        sourceSets.main.output
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    archiveBaseName = 'galactic_messenger_server'
+    manifest {
+            attributes 'Main-Class': 'ServerMain'
+    }
+    destinationDirectory = file('../build/libs')
+}
