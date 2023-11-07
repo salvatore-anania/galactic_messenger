@@ -3,8 +3,6 @@ import java.net.*;
 import java.util.List;
 
 import java.sql.Connection;
-import java.sql.SQLException;
-
 
 public class ClientHandler implements Runnable {
     private List<Channels> channels;

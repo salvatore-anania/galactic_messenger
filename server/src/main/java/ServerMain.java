@@ -52,15 +52,16 @@ public class ServerMain {
             } catch (IOException e) {
                 System.err.println("Erreur lors de la création du serveur : " + e.getMessage());
             }
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         } catch (SQLException e) {
             System.err.println("Erreur lors de la connexion à la base de données : " + e.getMessage());
         }
-        try {
-            if (connection != null) {
-                connection.close();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        
     }
 }
