@@ -31,8 +31,8 @@ public class ServerMain {
             List<Users> clients = new ArrayList<>();
             List<Users> connectedClients = new ArrayList<>();
             List<Channels> channels = new ArrayList<>();
-            channels.add(new Channels(clients, ""));
-            channels.add(new Channels(connectedClients, ""));
+            channels.add(new Channels(clients, "","entry"));
+            channels.add(new Channels(connectedClients, "", "general"));
 
             try (ServerSocket serverSocket = new ServerSocket(serverPort)) {
                 InetAddress serverAddress = InetAddress.getLocalHost(); // Obtient l'adresse IP de la machine locale
@@ -43,7 +43,7 @@ public class ServerMain {
                     Socket clientSocket = serverSocket.accept();
                     System.out.println("Nouvelle connexion : " + clientSocket.getInetAddress().getHostAddress());
 
-                    clients.add(new Users(clientSocket, "", channels.get(0)));
+                    clients.add(new Users(clientSocket, "", channels.get(0).getChannelName()));
 
                     // Créez un thread pour gérer la communication avec le client
                     Thread clientThread = new Thread(new ClientHandler(clientSocket, channels, connection));
@@ -64,4 +64,5 @@ public class ServerMain {
         }
         
     }
+
 }

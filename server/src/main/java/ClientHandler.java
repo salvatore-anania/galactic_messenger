@@ -10,12 +10,9 @@ public class ClientHandler implements Runnable {
     private Users user;
 
     public ClientHandler(Socket clientSocket, List<Channels> channels, Connection connection) {
-        this.user = new Users(clientSocket, "", channels.get(0));
+        this.user = new Users(clientSocket, "", channels.get(0).getChannelName());
         this.channels = channels;
         this.connection = connection;
-    }
-    public String getSocketname(){
-        return this.user.getUsename();
     }
     
     @Override
@@ -39,20 +36,16 @@ public class ClientHandler implements Runnable {
                 if (message.charAt(0) == '/'){
                     commandeCode = commandHandler.getCommand(message, user, connection, channels);
                 }
-                if (commandeCode[0] == 0 && user.getUsename().length() > 0){
+                if (commandeCode[0] == 0 && user.getUsername().length() > 0){
                     // Envoyer le message à tous les autres channels
-                    for (Users otherClient : user.getCurrentChannel().getChannelUsers()) {
-                        if (otherClient.getSocket() != user.getSocket()) {
+                    String channelName = user.getCurrentChannel();
+                    Channels channel =getChannelByName(channels, channelName);
+                    for (Users otherClient : channel.getChannelUsers()) {
+                        if ((otherClient.getSocket() != user.getSocket()) && otherClient.getCurrentChannel().equals(channelName)){
                             PrintWriter otherOut = new PrintWriter(otherClient.getSocket().getOutputStream(), true);
-                            otherOut.println(user.getUsename() + ": " + message);
+                            otherOut.println(user.getUsername() + ": " + message);
                         }
                     }
-                }else if(commandeCode[0] == 3 && commandeCode[1] == 1){
-                    user.setUsername(message.split(" ")[1]);
-                    channels.get(0).removeBySocket(user.getSocket());
-                    channels.get(1).addUser(new Users(user.getSocket(), user.getUsename(), channels.get(1)));
-                    user.setCurrentChannel(channels.get(1));                    
-                    out.println("Vous êtes connecté en tant que " + user.getUsename());
                 }
             }
             System.out.println("Client déconnecté : " + clientAddress);
@@ -64,4 +57,14 @@ public class ClientHandler implements Runnable {
         }
         
     }
+    
+    public static Channels getChannelByName( List<Channels> channels ,String name){
+        for(Channels channel : channels){
+            if(channel.getChannelName().equals(name)){
+                return channel;
+            }
+        }
+        return null;
+    }
+
 }

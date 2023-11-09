@@ -6,10 +6,12 @@ import java.util.List;
 public class Channels {
     private List<Users> users;
     private String password;
+    private String name;
 
-    public Channels(List<Users> users, String password) {
+    public Channels(List<Users> users, String password, String name) {
         this.users = users;
         this.password = password;
+        this.name = name;
     }
 
     public List<Users> getChannelUsers() {
@@ -28,17 +30,25 @@ public class Channels {
         return clients;
     }
 
+    public void setChannelUsers(List<Users> users) {
+        this.users = users;
+    }
+
+    public String getChannelName() {
+        return this.name;
+    }
+
     public List<String> getChannelUsernames() {
         List<String> usernames = new ArrayList<String>();
         for (Users user : users) {
-            usernames.add(user.getUsename());
+            usernames.add(user.getUsername());
         }
         return usernames;
     }
 
     public Users getUserByUsername(String username) {
         for (Users user : users) {
-            if (user.getUsename().equals(username)) {
+            if (user.getUsername().equals(username)) {
                 return user;
             }
         }
@@ -59,11 +69,7 @@ public class Channels {
     }
 
     public void addUserUnlog(Socket client,Channels channel){
-        this.users.add(new Users(client, "", channel));
-    }
-
-    public void removeUser(Users user){
-        this.users.remove(user);
+        this.users.add(new Users(client, "", channel.getChannelName()));
     }
 
     public void removeBySocket(Socket client){
@@ -72,6 +78,29 @@ public class Channels {
 
     public String getPassword() {
         return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void updateOneUser(Users user){
+        for(Users userChannel : users){
+            if(userChannel.getSocket() == user.getSocket()){
+                userChannel.setCurrentChannel(user.getCurrentChannel());
+                userChannel.setUsername(user.getUsername());
+            }
+        }
+    }
+
+    public void updateUsers(List<Users> usersList){
+        for(Users user : usersList){
+            for(Users userChannel : users){
+                if(userChannel.getSocket() == user.getSocket()){
+                    userChannel.setCurrentChannel(user.getCurrentChannel());
+                }
+            }
+        }
     }
 
 }

@@ -5,9 +5,9 @@ import java.net.Socket;
 public class Users {
     private Socket client;
     private String username;
-    private Channels currentChannel;
+    private String currentChannel;
 
-    public Users(Socket client, String username, Channels currentChannel) {
+    public Users(Socket client, String username, String currentChannel) {
         this.client = client;
         this.username = username;
         this.currentChannel = currentChannel;
@@ -17,15 +17,15 @@ public class Users {
         return client;
     }
 
-    public String getUsename() {
+    public String getUsername() {
         return username;
     }
 
-    public Channels getCurrentChannel() {
+    public String getCurrentChannel() {
         return currentChannel;
     }
 
-    public void setCurrentChannel(Channels currentChannel) {
+    public void setCurrentChannel(String currentChannel) {
         this.currentChannel = currentChannel;
     }
 

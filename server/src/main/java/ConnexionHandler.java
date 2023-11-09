@@ -1,7 +1,7 @@
 import java.net.*;
 import java.io.*;
 import java.sql.*;
-
+import java.util.List;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.nio.charset.StandardCharsets;
@@ -45,7 +45,7 @@ public class ConnexionHandler {
         return 0;
     }
 
-    public static int doLogin(String message, Connection connection,Users user) {
+    public static int doLogin(List<Channels> channels, String message, Connection connection,Users user) {
         try {
             PrintWriter out = new PrintWriter(user.getSocket().getOutputStream(), true);
             try{
@@ -63,6 +63,11 @@ public class ConnexionHandler {
                     String password = resultSet.getString("password");
                     String name = resultSet.getString("name");
                     if(name.equals(message.split(" ")[1]) && password.equals(bytesToHex(encodedhash))){
+                        user.setUsername(message.split(" ")[1]);
+                        channels.get(0).removeBySocket(user.getSocket());
+                        channels.get(1).addUser(new Users(user.getSocket(), user.getUsername(), channels.get(1).getChannelName()));
+                        user.setCurrentChannel(channels.get(1).getChannelName());                    
+                        out.println("Vous êtes connecté en tant que " + user.getUsername());
                         return 1;
                     }
                 }
