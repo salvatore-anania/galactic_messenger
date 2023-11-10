@@ -7,6 +7,16 @@ public class GroupHandler {
         try {
             String[] tableMessage = message.split(" ");
             PrintWriter out = new PrintWriter(creator.getSocket().getOutputStream(), true);
+            if (tableMessage.length == 3) {
+                if(!tableMessage[2].contains("secure")){
+                    out.println("La commande est mal formulée.");
+                    return 0;
+                }
+            }
+            else if (tableMessage.length != 2) {
+                out.println("La commande est mal formulée.");
+                return 0;
+            }
             String groupName = tableMessage[1];
             Channels groupChannel = new Channels(new ArrayList<Users>(), "", groupName);
             if(tableMessage[0].contains("secure")){
@@ -26,7 +36,17 @@ public class GroupHandler {
     public static int doJoinGroup(List<Channels> channels, Users requestingUser, String message) {
         try {
             String[] tableMessage = message.split(" ");
-            PrintWriter out = new PrintWriter(requestingUser.getSocket().getOutputStream(), true);        
+            PrintWriter out = new PrintWriter(requestingUser.getSocket().getOutputStream(), true);
+            if (tableMessage.length == 3) {
+                if(!tableMessage[2].contains("secure")){
+                    out.println("La commande est mal formulée.");
+                    return 0;
+                }
+            }
+            else if (tableMessage.length != 2) {
+                out.println("La commande est mal formulée.");
+                return 0;
+            }
             String groupName = tableMessage[1];
             Channels groupChannel = ClientHandler.getChannelByName(channels, groupName);
             if(tableMessage[0].contains("secure") && !(tableMessage[2].equals(groupChannel.getPassword()))){
@@ -45,18 +65,21 @@ public class GroupHandler {
 
     public static int doMessagGroup(List<Channels> channels, Users sendingUser, String message) {
         try {
+            PrintWriter out = new PrintWriter(sendingUser.getSocket().getOutputStream(), true);
             String[] tableMessage = message.split(" ");
             String groupName = tableMessage[1];
             tableMessage[0] = "";
             tableMessage[1] = "";
             Channels group = ClientHandler.getChannelByName(channels, groupName);
+            if (tableMessage.length < 3) {
+                out.println("La commande est mal formulée.");
+                return 0;
+            }
             if(group == null){
-                PrintWriter out = new PrintWriter(sendingUser.getSocket().getOutputStream(), true);
                 out.println("Le groupe "+groupName+" n'existe pas.");
                 return 0;
             }
             if(!group.getChannelUsers().contains(sendingUser)){
-                PrintWriter out = new PrintWriter(sendingUser.getSocket().getOutputStream(), true);
                 out.println("Vous ne faite pas partie du groupe "+groupName+".");
                 return 0;
             }
@@ -64,6 +87,7 @@ public class GroupHandler {
                 if ((otherClient.getSocket() != sendingUser.getSocket())) {
                     PrintWriter otherOut = new PrintWriter(otherClient.getSocket().getOutputStream(), true);
                     message= String.join(" ", tableMessage);
+                    message= message.trim();
                     otherOut.println(groupName +" : " + sendingUser.getUsername() + " : " + message);
                 }
             }
@@ -71,8 +95,7 @@ public class GroupHandler {
         }catch (IOException e) {
             System.err.println("Erreur lors de l'envoi du message au client : " + e.getMessage());
         }
-        return 0;
-        
+        return 0;  
     }
 
     public static int doExitGroup(List<Channels> channels, Users user, String message){

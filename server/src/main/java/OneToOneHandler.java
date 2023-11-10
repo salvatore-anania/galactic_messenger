@@ -9,9 +9,14 @@ public class OneToOneHandler {
         List<String> usernames = channelgeneral.getChannelUsernames();
         try {
             PrintWriter out = new PrintWriter(requestingUser.getSocket().getOutputStream(), true);
+            String[] params = message.split(" ");
+            if (params.length != 2) {
+                out.println("Connexion request failed: wrong argument number");
+                return 0;
+            }
             for (String username : usernames) {
-                if (username.equals(message.split(" ")[1])) {
-                    PrintWriter outReceiver = new PrintWriter(channelgeneral.getUserByUsername(username).getSocket().getOutputStream(), true);
+                if (username.equals(params[1])) {
+                    PrintWriter outReceiver= new PrintWriter(channelgeneral.getUserByUsername(username).getSocket().getOutputStream(), true);
                     out.println("Connexion request sent to "+username);
                     String channelName="private_"+requestingUser.getUsername()+"_"+username;
                     Channels privateChannel = new Channels(new ArrayList<Users>(), "", channelName);
@@ -33,18 +38,32 @@ public class OneToOneHandler {
     public static int doConnexionResponse(List<Channels> channels,Users receivingUser, Users requestingUser, String message) {
         try {
             PrintWriter out = new PrintWriter(receivingUser.getSocket().getOutputStream(), true);
-            PrintWriter outReceiver = new PrintWriter(requestingUser.getSocket().getOutputStream(), true);
-            if(message.startsWith("/accept")){
+            PrintWriter outRequesting = new PrintWriter(requestingUser.getSocket().getOutputStream(), true);
+            String[] params = message.split(" ");
+            if (params.length != 2) {
+                out.println("Connexion response failed: wrong argument number");
+                return 0;
+            }
+            if(params[0].equals("/accept")){
+                if(!params[1].equals(requestingUser.getUsername())){
+                    out.println("Connexion response failed: wrong username");
+                    return 0;
+                }
                 Channels previousChannel=ClientHandler.getChannelByName(channels,receivingUser.getCurrentChannel());          
                 String channelName="private_"+requestingUser.getUsername()+"_"+receivingUser.getUsername();
                 Channels privateChannel = ClientHandler.getChannelByName(channels, channelName);
                 receivingUser.setCurrentChannel(privateChannel.getChannelName());
                 privateChannel.addUser(receivingUser);
                 out.println("Vous êtes connecté en privé avec "+requestingUser.getUsername());
-                outReceiver.println("Vous êtes connecté en privé avec "+receivingUser.getUsername());
+                outRequesting.println("Vous êtes connecté en privé avec "+receivingUser.getUsername());
                 previousChannel.updateUsers(privateChannel.getChannelUsers());
                 return 1;
             }else{
+                if(!params[1].equals(requestingUser.getUsername())){
+                    out.println("Connexion response failed: wrong username");
+                    return 0;
+                }
+                outRequesting.println(receivingUser.getUsername() + " a refusé votre demande de connexion.");
                 requestingUser.setCurrentChannel(channels.get(1).getChannelName());
                 return 0;
             }

@@ -11,6 +11,11 @@ public class ConnexionHandler {
     public static int doRegister(String message, Connection connection,Socket clientSocket) {
         try {
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+            String[] param = message.split(" ");
+            if (param.length != 3) {
+                out.println("Register failed");
+                return 0;
+            }
             // Utilisez une requête paramétrée pour insérer des données
                 try{
                     String sql = "INSERT INTO users (name, password) VALUES (?, ?)";
@@ -19,7 +24,7 @@ public class ConnexionHandler {
                     byte[] encodedhash=null;
                     try {
                         digest = MessageDigest.getInstance("SHA-256");
-                        encodedhash= digest.digest( message.split(" ")[2].getBytes(StandardCharsets.UTF_8));
+                        encodedhash= digest.digest( param[2].getBytes(StandardCharsets.UTF_8));
                     } catch (NoSuchAlgorithmException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
@@ -27,7 +32,7 @@ public class ConnexionHandler {
                         return 0;
                     }
                     
-                    preparedStatement.setString(1, message.split(" ")[1]);
+                    preparedStatement.setString(1, param[1]);
                     preparedStatement.setString(2, bytesToHex(encodedhash));
                     // Exécutez la requête
                     preparedStatement.execute();
@@ -48,6 +53,11 @@ public class ConnexionHandler {
     public static int doLogin(List<Channels> channels, String message, Connection connection,Users user) {
         try {
             PrintWriter out = new PrintWriter(user.getSocket().getOutputStream(), true);
+            String[] param = message.split(" ");
+            if (param.length != 3) {
+                out.println("login failed");
+                return 0;
+            }
             try{
                 // Utilisez une requête paramétrée pour insérer des données
                 String sql2 = "SELECT * FROM users";
@@ -57,13 +67,13 @@ public class ConnexionHandler {
                 byte[] encodedhash=null;
                 try {
                     digest = MessageDigest.getInstance("SHA-256");
-                    encodedhash= digest.digest( message.split(" ")[2].getBytes(StandardCharsets.UTF_8));
+                    encodedhash= digest.digest(param[2].getBytes(StandardCharsets.UTF_8));
                     while (resultSet.next()) {
         
                     String password = resultSet.getString("password");
                     String name = resultSet.getString("name");
-                    if(name.equals(message.split(" ")[1]) && password.equals(bytesToHex(encodedhash))){
-                        user.setUsername(message.split(" ")[1]);
+                    if(name.equals(param[1]) && password.equals(bytesToHex(encodedhash))){
+                        user.setUsername(param[1]);
                         channels.get(0).removeBySocket(user.getSocket());
                         channels.get(1).addUser(new Users(user.getSocket(), user.getUsername(), channels.get(1).getChannelName()));
                         user.setCurrentChannel(channels.get(1).getChannelName());                    

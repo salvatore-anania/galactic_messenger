@@ -7,6 +7,7 @@ public class CommandHandler {
 
     public int[] getCommand(String message, Users user, Connection connection, List<Channels> channels) {
         int commandeCode = 0;
+        message = message.trim().replaceAll("\\s+", " ");;
         if (message.equals("/help") || message.equals("/h")) {
             commandeCode = 1;
         }
