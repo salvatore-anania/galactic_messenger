@@ -22,7 +22,7 @@ public class ClientMain {
                             if (response == null) {
                                 break;
                             }
-                            System.out.println("Serveur : " + response);
+                            System.out.println(response);
                         } catch (IOException e) {
                             System.err.println("Erreur de réception : " + e.getMessage());
                             break;
